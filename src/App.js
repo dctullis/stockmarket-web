@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./App.css";
+import MainLayout from "./layouts/MainLayout/MainLayout";
+import { HashRouter as Router } from "react-router-dom";
+import { MarketContextProvider } from "./context/MarketContext";
+import Amplify from "aws-amplify";
+import awsExports from "./aws-exports";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+
+Amplify.configure(awsExports);
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Authenticator>
+        <Router>
+          <MarketContextProvider>
+            <MainLayout />
+          </MarketContextProvider>
+        </Router>
+      </Authenticator>
+    </>
   );
 }
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
 export default App;
