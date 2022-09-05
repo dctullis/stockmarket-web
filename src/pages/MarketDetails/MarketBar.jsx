@@ -45,6 +45,7 @@ const MarketBar = () => {
     GetAllCompaniesAPI()
       .then((companies) => setResults(companies))
       .catch((error) => {
+        //update
         console.log(error);
       });
   }, []);
