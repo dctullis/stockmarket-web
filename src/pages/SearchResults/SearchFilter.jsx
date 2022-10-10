@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState, Fragment, useContext } from "react";
 import SearchBar from "./SearchResults";
 import { Table, TableBody, Popover } from "@mui/material";
 import {
@@ -7,7 +7,7 @@ import {
 } from "../../components/table/styles";
 import { GetAllCompaniesAPI } from "../../api/MarketAPI";
 import { useNavigate } from "react-router-dom";
-import { useCompanyContext } from "../../context/MarketContext";
+import {MarketContext} from "context/MarketContext";
 
 const SearchFilter = () => {
   const [search, setSearch] = useState("");
@@ -15,7 +15,7 @@ const SearchFilter = () => {
   const [results, setResults] = useState([]);
   const nav = useNavigate();
   const [cursor, setCursor] = useState("");
-  const { setCompanyCode } = useCompanyContext();
+  const { setCompanyCode } = useContext(MarketContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(true);
 
@@ -26,9 +26,6 @@ const SearchFilter = () => {
   useEffect(() => {
     GetAllCompaniesAPI()
       .then((companies) => setResults(companies))
-      .then((resp) => {
-        console.log(resp);
-      })
       .catch((error) => {
         console.log(error);
       });

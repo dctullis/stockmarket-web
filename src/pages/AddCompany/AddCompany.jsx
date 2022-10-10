@@ -2,7 +2,7 @@ import {
   Card,
   CardContent
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./AddCompany.scss";
 import AddCompanyForm from "../../components/form/AddCompanyForm"
 import img from "../../assets/add.svg"

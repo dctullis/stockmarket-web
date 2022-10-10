@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useMemo, useEffect, useState } from "react";
 import {
   GetSpecificCompanyAPI,
   GetStockInformationByCompany,
@@ -6,20 +6,17 @@ import {
 } from "../../api/MarketAPI";
 import "./MarketDetails.scss";
 import { StockChart } from "../../components/charts/StockChart";
-import {
-  useCompanyContext,
-  useStartDateContext,
-  useEndDateContext,
-  useStockPriceContext,
-} from "../../context/MarketContext";
-
-
+import { MarketContext } from "context/MarketContext";
 
 const MarketDetails = () => {
-  const { companyCode } = useCompanyContext();
-  const { startDate, setStartDate } = useStartDateContext();
-  const { endDate, setEndDate } = useEndDateContext();
-  const { stockPrice } = useStockPriceContext();
+  const {
+    companyCode,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    stockPrice,
+  } = useContext(MarketContext);
   const [prices, setPrices] = useState([0.01]);
   const [company, setCompany] = useState({
     companyCode: "",
@@ -29,14 +26,7 @@ const MarketDetails = () => {
     companyWebsite: "",
     listedStockExchange: "",
   });
-  const [stock, setStock] = useState([
-    {
-      company_code: "",
-      id: 999,
-      stock_price: 0.0,
-      stock_price_date_time: "1900-01-01T16:41:07",
-    },
-  ]);
+  const [stock, setStock] = useState(undefined);
 
   useEffect(() => {
     updateCompany();
@@ -44,19 +34,18 @@ const MarketDetails = () => {
   }, [companyCode]);
 
   useEffect(() => {
-    if(stock[0]?.company_code === "")
+    if(stockPrice < 0.0001){
       return;
+    }
 
-    AddStockPriceAPI(companyCode, stockPrice).then(() => {
-      updateStock();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    
-  }, [stockPrice])
-
-  
+    AddStockPriceAPI(companyCode, stockPrice)
+      .then(() => {
+        updateStock();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [stockPrice]);
 
   const updateStock = () => {
     let now = new Date().toJSON().slice(0, 10);
@@ -80,42 +69,43 @@ const MarketDetails = () => {
   };
 
   useEffect(() => {
-    let newDates = stock?.companyDetails?.map((a) =>
-      new Date(a.stock_price_date_time).toDateString()
-    );
-    let stateDates = newDates?.filter((a, b) => {
+    if (stock === undefined) {
+      return;
+    }
+
+    const dateRange = [];
+    const prices = [];
+
+    stock?.companyDetails?.map((index) => {
+      dateRange.push(new Date(index.stockPriceDateTime).toDateString());
+    });
+
+    const startAndEndDateRange = dateRange.filter((a, b) => {
       return Date.parse(a) > Date.parse(b);
     });
 
-    setStartDate(stateDates?.at(0)?.toString());
-    setEndDate(stateDates?.at(stateDates?.length - 1)?.toString());
+    const startDateLocal = startAndEndDateRange?.at(0)?.toString();
+    const endDateLocal = startAndEndDateRange?.at(startAndEndDateRange?.length - 1)?.toString();
+
+    setStartDate(startDateLocal)
+    setEndDate(endDateLocal)
+
+    stock.companyDetails.filter(index => {
+      const stockPriceTime = new Date(index.stockPriceDateTime);
+      if (stockPriceTime >= Date.parse(startDateLocal) && stockPriceTime.getDate() < new Date(endDateLocal).getDate() + 1)
+          prices.push(index.stockPrice);
+    });
+
+    setPrices(prices)
+
   }, [stock]);
 
-  useEffect(() => {
-    setPrices([]);
-    setPrices(
-      stock?.companyDetails
-        ?.filter((index) => {
-          let d = new Date(endDate);
-          d.setDate(new Date(endDate).getDate() + 1);
-
-          if (
-            new Date(index.stock_price_date_time) >= Date.parse(startDate) &&
-            Date.parse(index.stock_price_date_time) < d
-          )
-            return true;
-        })
-        .map((index) => {
-          return index.stock_price;
-        })
-    );
-  }, [stock, startDate, endDate]);
 
   return (
     <>
       <div className={"container"}>
         <StockChart
-          stock={stock}
+          stock={stock?.companyDetails}
           companyName={company.companyName}
           companyCode={companyCode}
         />

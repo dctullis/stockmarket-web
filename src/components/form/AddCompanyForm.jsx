@@ -1,6 +1,6 @@
-import { InputLabel, Autocomplete, Button } from "@mui/material";
+import { InputLabel, Autocomplete, Button, Alert } from "@mui/material";
 import { InputField, Dropdown } from "./styles";
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import "./AddCompanyForm.scss";
 import { stockExchanges } from "../../assets/exchanges";
 import { AddCompanyAPI } from "../../api/MarketAPI";
@@ -14,6 +14,8 @@ const AddCompanyForm = () => {
     companyWebsite: "",
     listedStockExchange: "",
   });
+  const [error, setError] = useState("");
+  const formRef = useRef(null);
 
   const updateCompany = (e) => {
     setCompany({
@@ -33,18 +35,17 @@ const AddCompanyForm = () => {
     });
   };
 
-  const submit = (e) => {
-    console.log(company)
-    try {
-      AddCompanyAPI(company);
-    } catch (error) {
-      console.log(error);
+  const submit = async (e) => {
+    setError("");
+    const response = await AddCompanyAPI(company);
+    if (response?.response?.data) {
+      setError(response.response.data);
     }
   };
 
   return (
     <>
-      <form>
+      <form ref={formRef}>
         <div>
           <InputLabel sx={{ color: "#F4F4F4" }}>Company Name</InputLabel>
           <InputField
@@ -52,6 +53,7 @@ const AddCompanyForm = () => {
             className={"field"}
             color="secondary"
             id="companyName"
+            data-testid="companyName"
             aria-describedby="company-form-name-field"
             disableUnderline={true}
             onChange={updateCompany}
@@ -65,6 +67,7 @@ const AddCompanyForm = () => {
             className={"field"}
             color="secondary"
             id="companyCode"
+            data-testid="companyCode"
             aria-describedby="company-form-code-field"
             disableUnderline={true}
             onChange={updateCompany}
@@ -78,6 +81,7 @@ const AddCompanyForm = () => {
             className={"field"}
             color="secondary"
             id="companyCEO"
+            data-testid="companyCEO"
             aria-describedby="company-form-ceo-field"
             disableUnderline={true}
             onChange={updateCompany}
@@ -92,6 +96,7 @@ const AddCompanyForm = () => {
             className={"field"}
             color="secondary"
             id="companyTurnover"
+            data-testid="companyTurnover"
             aria-describedby="company-form-turnover-field"
             disableUnderline={true}
             onChange={updateCompany}
@@ -106,20 +111,20 @@ const AddCompanyForm = () => {
             className={"field"}
             color="secondary"
             id="companyWebsite"
+            data-testid="companyWebsite"
             aria-describedby="company-form-website-field"
             disableUnderline={true}
             onChange={updateCompany}
             required={true}
           />
-          {/* <FormHelperText id="my-helper-text">We'll never share your email.</FormHelperText> */}
-
           <br />
           <br />
           <Autocomplete
             disablePortal
             id="combo-box-demo"
+            data-testid="companyStockExchange"
             options={stockExchanges}
-            sx={{ width: '96%' }}
+            sx={{ width: "96%" }}
             required={true}
             onChange={(e) =>
               setCompany({
@@ -133,12 +138,32 @@ const AddCompanyForm = () => {
           />
         </div>
       </form>
-      <Button className={"addButton"} onClick={submit} variant="contained">
+      <Button
+        data-testid="addButton"
+        className={"addButton"}
+        onClick={(e) => {
+          if (formRef.current.reportValidity()) {
+            submit(e);
+          } else {
+            formRef.current.reportValidity();
+          }
+        }}
+        variant="contained"
+      >
         Add
       </Button>
-      <Button className={"clearButton"} onClick={clear} variant="contained">
+      <Button
+        data-testid="clearButton"
+        className={"clearButton"}
+        onClick={() => {
+          clear();
+          setError("");
+        }}
+        variant="contained"
+      >
         Clear
       </Button>
+      {error?.length > 0 && <Alert severity="error">{error}</Alert>}
     </>
   );
 };

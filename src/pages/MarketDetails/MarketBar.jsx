@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   MenuItem,
   FormControl,
@@ -15,12 +15,6 @@ import {
   DeleteSpecificCompanyMarketEntryAPI,
   DeleteSpecificCompanyAPI,
 } from "../../api/MarketAPI";
-import {
-  useCompanyContext,
-  useStartDateContext,
-  useEndDateContext,
-  useStockPriceContext,
-} from "../../context/MarketContext";
 import { Dropdown, MUILabel, Field } from "./styles";
 import "./MarketBar.scss";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -28,15 +22,12 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useNavigate } from "react-router-dom";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import InputAdornment from "@mui/material/InputAdornment";
+import {MarketContext} from "context/MarketContext";
 
 const MarketBar = () => {
   const nav = useNavigate();
   const [results, setResults] = useState([]);
-  const { companyCode, setCompanyCode } = useCompanyContext();
-  const { startDate, setStartDate } = useStartDateContext();
-  const { endDate, setEndDate } = useEndDateContext();
-  const { setStockPrice } = useStockPriceContext();
+  const { companyCode, setCompanyCode, startDate, setStartDate, endDate, setEndDate, setStockPrice} = useContext(MarketContext)
   const [code, setCode] = useState(companyCode);
   const [newStockPrice, setNewStockPrice] = useState("");
   const [open, setOpen] = useState(false);
@@ -58,11 +49,11 @@ const MarketBar = () => {
   const removeCompany = () => {
     DeleteSpecificCompanyAPI(companyCode);
     DeleteSpecificCompanyMarketEntryAPI(companyCode);
-    nav(`/list`);
+    setCompanyCode("");
+    nav(`/`);
   };
 
   const addStockPrice = () => {
-    console.log(newStockPrice);
     if (newStockPrice.match(/^-?\d+\.?\d*$/)) {
       setStockPrice(newStockPrice);
       setNewStockPrice("");
@@ -80,6 +71,7 @@ const MarketBar = () => {
           value={code}
           label="Company"
           onChange={(e) => handleChange(e.target.value)}
+          data-testid="companyDropdown"
         >
           {results.map((item, index) => (
             <MenuItem key={index} value={item.companyCode}>
@@ -94,10 +86,9 @@ const MarketBar = () => {
           label="Start Date"
           value={startDate}
           onChange={(newValue) => {
-            console.log(newValue);
-            console.log(typeof newValue);
             setStartDate(newValue.toDateString());
           }}
+          data-testid="startDateDatepicker"
           renderInput={(params) => (
             <Field style={{ marginLeft: "5vw" }} fullWidth {...params} />
           )}
@@ -111,6 +102,7 @@ const MarketBar = () => {
           onChange={(newValue) => {
             setEndDate(newValue.toDateString());
           }}
+          data-testid="endDateDatepicker"
           renderInput={(params) => (
             <Field fullWidth style={{ marginLeft: "5vw" }} {...params} />
           )}
@@ -132,6 +124,7 @@ const MarketBar = () => {
                   onClick={() => {
                     setOpen(false);
                   }}
+                  data-testid="stockPriceButton"
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
@@ -157,6 +150,7 @@ const MarketBar = () => {
             onClick={() => {
               addStockPrice();
             }}
+            data-testid="stockPriceButtonAdd"
           >
             Submit
           </Button>

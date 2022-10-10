@@ -12,7 +12,6 @@ const SearchBar = (props) => {
         setValue(e.target.value);
         props.onSearch(e.target.value.toLowerCase());
         props.anchor(e.currentTarget)
-        console.log(e)
     }
 
   return (

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useContext, useState, useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,10 +8,10 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import "./StockChart.scss"
-import {useStartDateContext, useEndDateContext} from "../../context/MarketContext"
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import "./StockChart.scss";
+import { MarketContext } from "context/MarketContext";
 
 const top = "top";
 
@@ -26,14 +26,7 @@ ChartJS.register(
 );
 
 export const StockChart = ({ stock, companyName, companyCode }) => {
-
-  const {startDate} = useStartDateContext();
-  const {endDate} = useEndDateContext();
-
-  useEffect(() => {
-    let d = new Date(endDate)
-    d.setDate(new Date(endDate).getDate() + 1)
-  })
+  const { startDate, endDate } = useContext(MarketContext);
 
   const options = {
     responsive: true,
@@ -43,43 +36,54 @@ export const StockChart = ({ stock, companyName, companyCode }) => {
       },
       title: {
         display: true,
-        text: 'Company Code: ' + companyCode,
+        text: "Company Code: " + companyCode,
       },
     },
     maintainAspectRatio: true,
     borderWidth: 3,
   };
-  
+
+  const stockLabels = stock?.map((index) => {
+    const stockPriceTime = new Date(index.stockPriceDateTime);
+
+    if (
+      stockPriceTime >= Date.parse(startDate) &&
+      stockPriceTime.getDate() < new Date(endDate).getDate() + 1
+    ) {
+      return (
+        stockPriceTime.toISOString().split("T")[0] +
+        "   " +
+        stockPriceTime.toLocaleTimeString()
+      );
+    }
+  });
+
+  const stockDatasets = [
+    {
+      id: 1,
+      label: "Stock Price Overview for: " + companyName,
+      data: stock?.map((index) => {
+        const stockPriceTime = new Date(index.stockPriceDateTime);
+
+    if (
+      stockPriceTime >= Date.parse(startDate) &&
+      stockPriceTime.getDate() < new Date(endDate).getDate() + 1
+    ) {
+      return index.stockPrice;
+      }}),
+      borderColor: " #B28228",
+      backgroundColor: "#FFE002",
+    },
+  ];
 
   const data = {
-    labels: stock.companyDetails?.map((index) => {
-      let d = new Date(endDate);
-      d.setDate(new Date(endDate).getDate() + 1);
-
-      if(new Date(index.stock_price_date_time) >= Date.parse(startDate) && Date.parse(index.stock_price_date_time) < d)
-        return new Date(index.stock_price_date_time).toISOString().split("T")[0] + "   " + new Date(index.stock_price_date_time).toLocaleTimeString();
-    }),
-    datasets: [
-      {
-        id: 1,
-        label: 'Stock Price Overview for: ' + companyName,
-        data: stock.companyDetails?.map((index) => {
-          let d = new Date(endDate);
-          d.setDate(new Date(endDate).getDate() + 1);
-
-          if(new Date(index.stock_price_date_time) >= Date.parse(startDate) && Date.parse(index.stock_price_date_time) < d)
-            return index.stock_price;
-        }),
-        borderColor: ' #B28228',
-        backgroundColor: '#FFE002',
-      }
-    ],
+    labels: stockLabels,
+    datasets: stockDatasets,
   };
-
 
   return (
     <div className={"ChartContainer"}>
-     <Line options={options} data={data} />
+      <Line options={options} data={data} />
     </div>
   );
-}
+};

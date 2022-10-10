@@ -3,7 +3,6 @@ import MarketDetails from "./MarketDetails";
 import MarketBar from "./MarketBar";
 import "./MarketDetailsWrapper.scss";
 import { Grid } from "@mui/material";
-import img from "../../assets/data.svg";
 
 const MarketDetailsWrapper = () => {
   return (

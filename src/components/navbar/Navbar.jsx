@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import {
-  Box,
   Grid,
   Toolbar,
   Typography,
   Tabs,
   Tab,
-  InputAdornment,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
@@ -15,10 +13,8 @@ import logo from "../../assets/pathways_logo2.png";
 import AddchartIcon from "@mui/icons-material/Addchart";
 import SsidChartIcon from "@mui/icons-material/SsidChart";
 import "./Navbar.scss";
-import { StyledButton, SearchField } from "./styles";
-import SearchIcon from "@mui/icons-material/Search";
 import NavDrawer from "./NavDrawer";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SearchFilter from "pages/SearchResults/SearchFilter";
 
 export default function Navbar() {
@@ -42,7 +38,7 @@ export default function Navbar() {
             <Grid sx={{ placeItems: "center" }} container>
               <Grid item xs={1}>
                 <Typography>
-                <img className={"logo"} src={logo} />
+                  <img className={"logo"} src={logo} />
                 </Typography>
               </Grid>
               <Grid item xs={7}>
@@ -52,25 +48,25 @@ export default function Navbar() {
                   value={value}
                   onChange={(e, val) => setValue(val)}
                 >
-                    <Tab label={"Home"} onClick={() => nav("/")} val={0}/>
-                    <Tab
-                        icon={<AddchartIcon />}
-                        iconPosition="end"
-                        label={"Add Company"}
-                        onClick={() => nav("/add")}
-                        val={1}
-                    />
-                    <Tab
+                  <Tab label={"Home"} onClick={() => nav("/")} val={0} />
+                  <Tab
+                    icon={<AddchartIcon />}
+                    iconPosition="end"
+                    label={"Add Company"}
+                    onClick={() => nav("/add")}
+                    val={1}
+                  />
+                  <Tab
                     icon={<SsidChartIcon />}
                     iconPosition="end"
                     label={"List All Companies"}
                     onClick={() => nav("/list")}
                     val={2}
-                    />
+                  />
                 </Tabs>
               </Grid>
               <Grid item xs={1} />
-              <Grid item xs={3} sx={{marginTop: "-4rem"}}>
+              <Grid item xs={3} sx={{ marginTop: "-4rem" }}>
                 <SearchFilter />
               </Grid>
             </Grid>
