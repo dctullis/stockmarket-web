@@ -1,1 +1,2 @@
-export const BASE_URL = "http://localhost:4444/api/v1.0/market";
+export const BASE_URL_COMPANY = "http://ec2-3-226-241-20.compute-1.amazonaws.com/api/v1.0/market/company";
+export const BASE_URL_STOCK = "http://ec2-54-91-226-152.compute-1.amazonaws.com/api/v1.0/market/stock";

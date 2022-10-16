@@ -8,7 +8,7 @@ import {
   GetStockInformationByCompany,
 } from "api/MarketAPI";
 import axios from "axios";
-import { BASE_URL } from "util/ApplicationConstants";
+import { BASE_URL_COMPANY, BASE_URL_STOCK } from "util/ApplicationConstants";
 jest.mock("axios");
 
 describe("Add Company API Call", () => {
@@ -16,7 +16,7 @@ describe("Add Company API Call", () => {
     const token = { token: "xyz" };
     AddCompanyAPI(token);
     expect(axios.post).toHaveBeenCalledWith(
-      `${BASE_URL}/company/register`,
+      `${BASE_URL_COMPANY}/register`,
       token
     );
   });
@@ -29,7 +29,7 @@ describe("Add StockPrice API Call", () => {
     axios.post.mockResolvedValueOnce("SUCCESS");
     const result = await AddStockPriceAPI(companyCode, stockPrice);
     expect(axios.post).toHaveBeenCalledWith(
-      `${BASE_URL}/stock/add/${companyCode}`,
+      `${BASE_URL_STOCK}/add/${companyCode}`,
       stockPrice
     );
     expect(result).toEqual("SUCCESS");
@@ -39,7 +39,7 @@ describe("Add StockPrice API Call", () => {
 describe("Get All Companies API Call", () => {
   it("should call GET to the right location", async () => {
     await GetAllCompaniesAPI();
-    expect(axios.get).toHaveBeenCalledWith(`${BASE_URL}/company/getall`);
+    expect(axios.get).toHaveBeenCalledWith(`${BASE_URL_COMPANY}/getall`);
   });
 });
 
@@ -48,7 +48,7 @@ describe("Delete Specific Company API Call", () => {
     const companyCode = "000";
     DeleteSpecificCompanyAPI(companyCode);
     expect(axios.delete).toHaveBeenCalledWith(
-      `${BASE_URL}/company/delete/${companyCode}`
+      `${BASE_URL_COMPANY}/delete/${companyCode}`
     );
   });
 });
@@ -58,7 +58,7 @@ describe("Delete Specific Company's Market Entry API Call", () => {
     const companyCode = "000";
     DeleteSpecificCompanyMarketEntryAPI(companyCode);
     expect(axios.delete).toHaveBeenCalledWith(
-      `${BASE_URL}/stock/delete/${companyCode}`
+      `${BASE_URL_STOCK}/delete/${companyCode}`
     );
   });
 });
@@ -68,7 +68,7 @@ describe("Get Specific Company API Call", () => {
     const companyCode = "000";
     GetSpecificCompanyAPI(companyCode);
     expect(axios.get).toHaveBeenCalledWith(
-      `${BASE_URL}/company/info/${companyCode}`
+      `${BASE_URL_COMPANY}/info/${companyCode}`
     );
   });
 });
@@ -80,7 +80,7 @@ describe("Get Stock Information By Company API Call", () => {
     const endDate = "3000-01-01";
     GetStockInformationByCompany(companyCode, startDate, endDate);
     expect(axios.get).toHaveBeenCalledWith(
-      `${BASE_URL}/stock/get/${companyCode}/${startDate}/${endDate}`
+      `${BASE_URL_STOCK}/get/${companyCode}/${startDate}/${endDate}`
     );
   });
 });

@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   GetSpecificCompanyAPI,
   GetStockInformationByCompany,
@@ -51,6 +51,7 @@ const MarketDetails = () => {
     let now = new Date().toJSON().slice(0, 10);
     GetStockInformationByCompany(companyCode, "1900-01-01", now)
       .then((c) => {
+        console.log(c)
         setStock(c);
       })
       .catch((error) => {
@@ -77,21 +78,25 @@ const MarketDetails = () => {
     const prices = [];
 
     stock?.companyDetails?.map((index) => {
-      dateRange.push(new Date(index.stockPriceDateTime).toDateString());
+      const dateArray = index.stockPriceDateTime;
+      const stockPriceTime = new Date(`${dateArray[0]}-${dateArray[1]}-${dateArray[2]}`);
+      dateRange.push(new Date(stockPriceTime).toDateString());
     });
 
     const startAndEndDateRange = dateRange.filter((a, b) => {
       return Date.parse(a) > Date.parse(b);
     });
 
+
     const startDateLocal = startAndEndDateRange?.at(0)?.toString();
-    const endDateLocal = startAndEndDateRange?.at(startAndEndDateRange?.length - 1)?.toString();
+    const endDateLocal = new Date (new Date(startAndEndDateRange?.at(startAndEndDateRange?.length - 1)).getTime()+1000*60*60*24)?.toDateString();
 
     setStartDate(startDateLocal)
     setEndDate(endDateLocal)
 
     stock.companyDetails.filter(index => {
-      const stockPriceTime = new Date(index.stockPriceDateTime);
+      const dateArray = index.stockPriceDateTime;
+      const stockPriceTime = new Date(`${dateArray[0]}-${dateArray[1]}-${dateArray[2]}`);
       if (stockPriceTime >= Date.parse(startDateLocal) && stockPriceTime.getDate() < new Date(endDateLocal).getDate() + 1)
           prices.push(index.stockPrice);
     });

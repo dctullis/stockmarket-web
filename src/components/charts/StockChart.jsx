@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,6 +28,10 @@ ChartJS.register(
 export const StockChart = ({ stock, companyName, companyCode }) => {
   const { startDate, endDate } = useContext(MarketContext);
 
+  useEffect(() => {
+    console.log(stock)
+  }, [stock])
+
   const options = {
     responsive: true,
     plugins: {
@@ -44,12 +48,14 @@ export const StockChart = ({ stock, companyName, companyCode }) => {
   };
 
   const stockLabels = stock?.map((index) => {
-    const stockPriceTime = new Date(index.stockPriceDateTime);
+    const dateArray = index.stockPriceDateTime;
+    const stockPriceTime = new Date(`${dateArray[0]}-${dateArray[1]}-${dateArray[2]}T${dateArray[3] < 10 ? 0 : ''}${dateArray[3]}:${dateArray[4] < 10 ? 0 : ''}${dateArray[4]}:${dateArray[5] < 10 ? 0 : ''}${dateArray[5]}`);
 
     if (
       stockPriceTime >= Date.parse(startDate) &&
       stockPriceTime.getDate() < new Date(endDate).getDate() + 1
-    ) {
+    ) { 
+   
       return (
         stockPriceTime.toISOString().split("T")[0] +
         "   " +
@@ -62,15 +68,18 @@ export const StockChart = ({ stock, companyName, companyCode }) => {
     {
       id: 1,
       label: "Stock Price Overview for: " + companyName,
-      data: stock?.map((index) => {
-        const stockPriceTime = new Date(index.stockPriceDateTime);
+      data: 
+      stock?.map((index) => {
+        const dateArray = index.stockPriceDateTime;
+        const stockPriceTime = new Date(`${dateArray[0]}-${dateArray[1]}-${dateArray[2]}T${dateArray[3] < 10 ? 0 : ''}${dateArray[3]}:${dateArray[4] < 10 ? 0 : ''}${dateArray[4]}:${dateArray[5] < 10 ? 0 : ''}${dateArray[5]}`);
 
     if (
       stockPriceTime >= Date.parse(startDate) &&
       stockPriceTime.getDate() < new Date(endDate).getDate() + 1
     ) {
       return index.stockPrice;
-      }}),
+      }})
+      ,
       borderColor: " #B28228",
       backgroundColor: "#FFE002",
     },

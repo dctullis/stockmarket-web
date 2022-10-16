@@ -39,6 +39,7 @@ const MarketBar = () => {
         //update
         console.log(error);
       });
+      console.log(new Date(startDate))
   }, []);
 
   const handleChange = (value) => {
@@ -84,7 +85,7 @@ const MarketBar = () => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
           label="Start Date"
-          value={startDate}
+          value={new Date(startDate)}
           onChange={(newValue) => {
             setStartDate(newValue.toDateString());
           }}
